@@ -30,10 +30,22 @@ export class BoardComponent implements AfterViewInit {
   @ViewChild("board", { static: true }) canvas: ElementRef<HTMLCanvasElement>;
   @ViewChild("next", { static: true })
   canvasNext: ElementRef<HTMLCanvasElement>;
-  @ViewChild("audio") set playerRef(ref: ElementRef<HTMLAudioElement>) {
-    this.audio = ref.nativeElement;
+  @ViewChild("audioA") set a(ref: ElementRef<HTMLAudioElement>) {
+    this.audio.a = ref.nativeElement;
   }
-  audio: HTMLAudioElement;
+
+  @ViewChild("audioB") set b(ref: ElementRef<HTMLAudioElement>) {
+    this.audio.b = ref.nativeElement;
+  }
+  @ViewChild("audioC") set c(ref: ElementRef<HTMLAudioElement>) {
+    this.audio.c = ref.nativeElement;
+  }
+
+  audio: {
+    a?: HTMLAudioElement;
+    b?: HTMLAudioElement;
+    c?: HTMLAudioElement;
+  } = {};
   ctx: CanvasRenderingContext2D;
   ctxNext: CanvasRenderingContext2D;
   board: number[][];
@@ -131,8 +143,8 @@ export class BoardComponent implements AfterViewInit {
     }
 
     this.animate();
-    this.audio.play();
-    this.audio.volume = 1;
+    this.audio.b.play();
+    this.audio.b.volume = 1;
   }
 
   resetGame() {
@@ -290,13 +302,13 @@ export class BoardComponent implements AfterViewInit {
     if (this.gameStarted) {
       if (this.paused) {
         this.animate();
-        this.audio.play();
+        this.audio.b.play();
       } else {
         this.ctx.font = "1px Arial";
         this.ctx.fillStyle = "black";
         this.ctx.fillText("GAME PAUSED", 1.4, 4);
         cancelAnimationFrame(this.requestId);
-        this.audio.pause();
+        this.audio.b.pause();
       }
 
       this.paused = !this.paused;
@@ -304,8 +316,8 @@ export class BoardComponent implements AfterViewInit {
   }
 
   gameOver() {
-    this.audio.pause();
-    this.audio.currentTime = 0;
+    this.audio.b.pause();
+    this.audio.b.currentTime = 0;
     this.gameStarted = false;
     cancelAnimationFrame(this.requestId);
     this.highScore =

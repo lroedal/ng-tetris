@@ -6,5 +6,7 @@ import { Component } from "@angular/core";
 })
 export class AppComponent {
   title = "ng-tetris";
-  // https://commons.wikimedia.org/wiki/File:Tetris_theme.ogg
+  // theme a - https://commons.wikimedia.org/wiki/File:Tetris_theme.ogg
+  // theme b - https://soundcloud.com/b4ssfreq/tetris-remix-final
+  // theme c - https://www.youtube.com/watch?v=ozea4GO-Hrg
 }
