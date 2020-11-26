@@ -1,11 +1,24 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --primary-background: #000;
+  --primary-background-contrast: #e4d8b4;
+  --secondary-background: #272324;
+  --secondary-background-contrast: #e4d8b4;
+}
+
+.bright {
+  --primary-background: #d7fcd4;
+  --primary-background-contrast: #545454;
+  --secondary-background: #b6cca1;
+  --secondary-background-contrast: #545454;
+}
+
 * {
   font-family: 'Press Start 2P', cursive;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: 320px 200px;
+  grid-template-columns: 1fr 320px 200px 1fr;
 }
 
 .right-column {
@@ -44,10 +57,16 @@
     font-size: 16px;
     padding: 15px 30px;
     cursor: pointer;
-    width: 140px; 
+    width: 140px;
     border: 1px solid black;
   }
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+}

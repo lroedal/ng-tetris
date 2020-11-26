@@ -1,11 +1,4 @@
-import {
-  Component,
-  ViewChild,
-  ElementRef,
-  OnInit,
-  HostListener,
-  AfterViewInit,
-} from "@angular/core";
+import { Component, ViewChild, ElementRef, OnInit, HostListener, AfterViewInit } from '@angular/core';
 import {
   COLS,
   BLOCK_SIZE,
@@ -17,34 +10,36 @@ import {
   POINTS,
   KEY,
   COLORSDARKER,
-} from "./constants";
-import { Piece, IPiece } from "./piece.component";
-import { GameService } from "./game.service";
-import { Zoundfx } from "ng-zzfx";
+} from './constants';
+import { Piece, IPiece } from './piece.component';
+import { GameService } from './game.service';
+import { Zoundfx } from 'ng-zzfx';
 
 @Component({
-  selector: "game-board",
-  templateUrl: "board.component.html",
+  selector: 'game-board',
+  templateUrl: 'board.component.html',
 })
 export class BoardComponent implements AfterViewInit {
-  @ViewChild("board", { static: true }) canvas: ElementRef<HTMLCanvasElement>;
-  @ViewChild("next", { static: true })
+  @ViewChild('board', { static: true }) canvas: ElementRef<HTMLCanvasElement>;
+  @ViewChild('next', { static: true })
   canvasNext: ElementRef<HTMLCanvasElement>;
-  @ViewChild("audioA") set a(ref: ElementRef<HTMLAudioElement>) {
-    this.audio.a = ref.nativeElement;
+  @ViewChild('audioA') set a(ref: ElementRef<HTMLAudioElement>) {
+    this.audio.A = ref.nativeElement;
   }
 
-  @ViewChild("audioB") set b(ref: ElementRef<HTMLAudioElement>) {
-    this.audio.b = ref.nativeElement;
+  @ViewChild('audioB') set b(ref: ElementRef<HTMLAudioElement>) {
+    this.audio.B = ref.nativeElement;
   }
-  @ViewChild("audioC") set c(ref: ElementRef<HTMLAudioElement>) {
-    this.audio.c = ref.nativeElement;
+  @ViewChild('audioC') set c(ref: ElementRef<HTMLAudioElement>) {
+    this.audio.C = ref.nativeElement;
   }
 
+  selectedTheme: 'A' | 'B' | 'C' | null = 'B';
+  selectedDisplayTheme: 'bright' | 'dark' = 'dark';
   audio: {
-    a?: HTMLAudioElement;
-    b?: HTMLAudioElement;
-    c?: HTMLAudioElement;
+    A?: HTMLAudioElement;
+    B?: HTMLAudioElement;
+    C?: HTMLAudioElement;
   } = {};
   ctx: CanvasRenderingContext2D;
   ctxNext: CanvasRenderingContext2D;
@@ -68,7 +63,7 @@ export class BoardComponent implements AfterViewInit {
   };
   playSoundFn: Function;
 
-  @HostListener("window:keydown", ["$event"])
+  @HostListener('window:keydown', ['$event'])
   keyEvent(event: KeyboardEvent) {
     if (event.keyCode === KEY.ESC) {
       this.gameOver();
@@ -107,7 +102,7 @@ export class BoardComponent implements AfterViewInit {
   }
 
   initBoard() {
-    this.ctx = this.canvas.nativeElement.getContext("2d");
+    this.ctx = this.canvas.nativeElement.getContext('2d');
 
     // Calculate size of canvas from constants.
     this.ctx.canvas.width = COLS * BLOCK_SIZE;
@@ -118,7 +113,7 @@ export class BoardComponent implements AfterViewInit {
   }
 
   initNext() {
-    this.ctxNext = this.canvasNext.nativeElement.getContext("2d");
+    this.ctxNext = this.canvasNext.nativeElement.getContext('2d');
 
     // Calculate size of canvas from constants.
     // The + 2 is to allow for space to add the drop shadow to
@@ -143,8 +138,15 @@ export class BoardComponent implements AfterViewInit {
     }
 
     this.animate();
-    this.audio.b.play();
-    this.audio.b.volume = 1;
+    if (this.selectedTheme) {
+      this.audio[this.selectedTheme].play();
+      this.audio[this.selectedTheme].volume = 1;
+    }
+  }
+
+  themeChanged(theme: 'A' | 'B' | 'C') {
+    this.selectedTheme = theme;
+    ['A', 'B', 'C'].forEach((k) => (this.audio[k].currentTime = 0));
   }
 
   resetGame() {
@@ -187,23 +189,7 @@ export class BoardComponent implements AfterViewInit {
         // Game over
         return false;
       }
-      this.playSoundFn([
-        ,
-        ,
-        224,
-        0.02,
-        0.02,
-        0.08,
-        1,
-        1.7,
-        -13.9,
-        ,
-        ,
-        ,
-        ,
-        ,
-        6.7,
-      ]);
+      this.playSoundFn([, , 224, 0.02, 0.02, 0.08, 1, 1.7, -13.9, , , , , , 6.7]);
       this.piece = this.next;
       this.next = new Piece(this.ctx);
       this.next.drawNext(this.ctxNext);
@@ -275,12 +261,12 @@ export class BoardComponent implements AfterViewInit {
 
   private addOutlines() {
     for (let index = 1; index < COLS; index++) {
-      this.ctx.fillStyle = "black";
+      this.ctx.fillStyle = 'black';
       this.ctx.fillRect(index, 0, 0.025, this.ctx.canvas.height);
     }
 
     for (let index = 1; index < ROWS; index++) {
-      this.ctx.fillStyle = "black";
+      this.ctx.fillStyle = 'black';
       this.ctx.fillRect(0, index, this.ctx.canvas.width, 0.025);
     }
   }
@@ -302,13 +288,13 @@ export class BoardComponent implements AfterViewInit {
     if (this.gameStarted) {
       if (this.paused) {
         this.animate();
-        this.audio.b.play();
+        this.audio[this.selectedTheme]?.play();
       } else {
-        this.ctx.font = "1px Arial";
-        this.ctx.fillStyle = "black";
-        this.ctx.fillText("GAME PAUSED", 1.4, 4);
+        this.ctx.font = '1px Arial';
+        this.ctx.fillStyle = 'black';
+        this.ctx.fillText('GAME PAUSED', 1.4, 4);
         cancelAnimationFrame(this.requestId);
-        this.audio.b.pause();
+        this.audio[this.selectedTheme]?.pause();
       }
 
       this.paused = !this.paused;
@@ -316,17 +302,19 @@ export class BoardComponent implements AfterViewInit {
   }
 
   gameOver() {
-    this.audio.b.pause();
-    this.audio.b.currentTime = 0;
+    if (this.selectedTheme) {
+      this.audio[this.selectedTheme].pause();
+      this.audio[this.selectedTheme].currentTime = 0;
+    }
+
     this.gameStarted = false;
     cancelAnimationFrame(this.requestId);
-    this.highScore =
-      this.points > this.highScore ? this.points : this.highScore;
-    this.ctx.fillStyle = "black";
+    this.highScore = this.points > this.highScore ? this.points : this.highScore;
+    this.ctx.fillStyle = 'black';
     this.ctx.fillRect(1, 3, 8, 1.2);
-    this.ctx.font = "1px Arial";
-    this.ctx.fillStyle = "red";
-    this.ctx.fillText("GAME OVER", 1.8, 4);
+    this.ctx.font = '1px Arial';
+    this.ctx.fillStyle = 'red';
+    this.ctx.fillText('GAME OVER', 1.8, 4);
   }
 
   getEmptyBoard(): number[][] {

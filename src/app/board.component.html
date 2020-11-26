@@ -1,37 +1,75 @@
-<audio #audioA id="audio" src="/assets/theme-a.ogx" preload="auto"></audio>
-<audio #audioB id="audio" src="/assets/theme-b.opus" preload="auto"></audio>
-<audio #audioC id="audio" src="/assets/theme-c.opus" preload="auto"></audio>
-<div class="grid">
-  <canvas #board class="game-board"></canvas>
-  <div class="right-column">
-    <div>
-      <h1>TETRIS</h1>
-      <p>Score: {{ points }}</p>
-      <p>Lines: {{ lines }}</p>
-      <p>Level: {{ level }}</p>
-      <p>High Score:</p>
-      <p>{{ highScore }}</p>
-      <p>Next Block:</p>
-      <canvas #next class="next"></canvas>
+<article [class]="selectedDisplayTheme">
+  <mat-toolbar
+    style="
+      display: grid;
+      grid-template-columns: auto auto auto auto auto 1fr;
+      column-gap: 20px;
+      background: var(--secondary-background);
+      color: var(--secondary-background-contrast);
+    "
+  >
+    <button mat-flat-button (click)="play()" class="play-button button" [disabled]="gameStarted">Play</button>
+    <button [disabled]="!gameStarted" mat-flat-button (click)="gameOver()" class="reset-button button">Reset</button>
+    <button mat-flat-button [disabled]="!gameStarted" (click)="pause()" class="pause-button button">Pause</button>
+    <button mat-flat-button [disabled]="gameStarted && !paused" [matMenuTriggerFor]="musicMenu" class="button">
+      Music
+    </button>
+    <button mat-flat-button [disabled]="gameStarted && !paused" [matMenuTriggerFor]="displayThemeMenu" class="button">
+      Theme
+    </button>
+  </mat-toolbar>
+
+  <mat-menu #musicMenu="matMenu">
+    <mat-radio-group
+      style="min-height: 125px; display: flex; flex-direction: column"
+      (change)="themeChanged($event?.value)"
+      [value]="selectedTheme"
+      fxLayout="column"
+    >
+      <mat-radio-button style="padding: 5px" value="A">Theme A</mat-radio-button>
+      <mat-radio-button style="padding: 5px" value="B">Theme B</mat-radio-button>
+      <mat-radio-button style="padding: 5px" value="C">Theme C</mat-radio-button>
+      <mat-radio-button style="padding: 5px" [value]="null">None</mat-radio-button>
+    </mat-radio-group>
+  </mat-menu>
+  <mat-menu #displayThemeMenu="matMenu">
+    <mat-radio-group
+      style="display: flex; flex-direction: column"
+      (change)="selectedDisplayTheme = $event?.value"
+      [value]="selectedDisplayTheme"
+      fxLayout="column"
+    >
+      <mat-radio-button style="padding: 5px" value="dark">Dark</mat-radio-button>
+      <mat-radio-button style="padding: 5px" value="bright">Bright</mat-radio-button>
+    </mat-radio-group>
+  </mat-menu>
+
+  <audio #audioA id="audio" src="/assets/theme-a.ogx" preload="auto"></audio>
+  <audio #audioB id="audio" src="/assets/theme-b.opus" preload="auto"></audio>
+  <audio #audioC id="audio" src="/assets/theme-c.opus" preload="auto"></audio>
+  <div
+    style="
+      min-height: 100vh;
+      padding: 20px;
+      background: var(--primary-background);
+      color: var(--primary-background-contrast);
+    "
+    class="grid"
+  >
+    <div class="placeholder"></div>
+    <canvas style="background: var(--secondary-background)" #board class="game-board"></canvas>
+    <div class="right-column">
+      <div>
+        <h1>TETRIS</h1>
+        <p>Score: {{ points }}</p>
+        <p>Lines: {{ lines }}</p>
+        <p>Level: {{ level }}</p>
+        <p>High Score:</p>
+        <p>{{ highScore }}</p>
+        <p>Next Block:</p>
+        <canvas #next class="next"></canvas>
+      </div>
     </div>
-    <div class="button-container">
-      <button (click)="play()" class="play-button button" *ngIf="!gameStarted">
-        Play
-      </button>
-      <button
-        (click)="gameOver()"
-        class="reset-button button"
-        *ngIf="gameStarted"
-      >
-        Reset
-      </button>
-      <button
-        (click)="pause()"
-        class="pause-button button"
-        [class.button-disabled]="!gameStarted"
-      >
-        Pause
-      </button>
-    </div>
+    <div class="placeholder"></div>
   </div>
-</div>
+</article>
