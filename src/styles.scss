@@ -12,6 +12,19 @@
   --secondary-background-contrast: #545454;
 }
 
+.cdk-overlay-pane.high-scores > mat-dialog-container {
+  padding: 0;
+}
+
+.clickable {
+  cursor: pointer;
+  text-decoration: underline;
+
+  &:hover {
+    font-weight: 600;
+  }
+}
+
 * {
   font-family: 'Press Start 2P', cursive;
 }

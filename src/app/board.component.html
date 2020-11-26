@@ -1,9 +1,13 @@
-<article [class]="selectedDisplayTheme">
+<article
+  [class]="selectedDisplayTheme"
+  style="min-height: 100vh; background: var(--primary-background); color: var(--primary-background-contrast)"
+>
   <mat-toolbar
     style="
       display: grid;
-      grid-template-columns: auto auto auto auto auto 1fr;
+      grid-template-columns: auto auto auto auto auto auto 1fr auto;
       column-gap: 20px;
+      align-content: center;
       background: var(--secondary-background);
       color: var(--secondary-background-contrast);
     "
@@ -17,6 +21,12 @@
     <button mat-flat-button [disabled]="gameStarted && !paused" [matMenuTriggerFor]="displayThemeMenu" class="button">
       Theme
     </button>
+    <mat-form-field [floatLabel]="'never'">
+      <mat-label>Name</mat-label>
+      <input #nameInput="matInput" matInput #userName (blur)="setName()" />
+    </mat-form-field>
+    <span class="placeholder"></span>
+    <span [class.clickable]="!!highScores?.length" (click)="showHighscores()">High Score: {{ highestScore }}</span>
   </mat-toolbar>
 
   <mat-menu #musicMenu="matMenu">
@@ -47,15 +57,7 @@
   <audio #audioA id="audio" src="/assets/theme-a.ogx" preload="auto"></audio>
   <audio #audioB id="audio" src="/assets/theme-b.opus" preload="auto"></audio>
   <audio #audioC id="audio" src="/assets/theme-c.opus" preload="auto"></audio>
-  <div
-    style="
-      min-height: 100vh;
-      padding: 20px;
-      background: var(--primary-background);
-      color: var(--primary-background-contrast);
-    "
-    class="grid"
-  >
+  <div style="padding: 20px; min-height: calc(100vh - 136px)" class="grid">
     <div class="placeholder"></div>
     <canvas style="background: var(--secondary-background)" #board class="game-board"></canvas>
     <div class="right-column">
@@ -72,4 +74,15 @@
     </div>
     <div class="placeholder"></div>
   </div>
+
+  <mat-toolbar
+    style="
+      height: 32px;
+      display: grid;
+      grid-template-columns: auto auto auto auto auto 1fr;
+      column-gap: 20px;
+      background: var(--secondary-background);
+      color: var(--secondary-background-contrast);
+    "
+  ></mat-toolbar>
 </article>

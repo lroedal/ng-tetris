@@ -8,9 +8,23 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { HighScoresComponent } from './high-scores/high-scores.component';
+import { MatDialogModule } from '@angular/material/dialog';
 @NgModule({
-  declarations: [AppComponent, BoardComponent],
-  imports: [BrowserModule, BrowserAnimationsModule, MatToolbarModule, MatMenuModule, MatRadioModule, MatButtonModule],
+  declarations: [AppComponent, BoardComponent, HighScoresComponent],
+  imports: [
+    BrowserModule,
+    BrowserAnimationsModule,
+    MatToolbarModule,
+    MatMenuModule,
+    MatRadioModule,
+    MatButtonModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatDialogModule,
+  ],
   providers: [],
   bootstrap: [AppComponent],
 })

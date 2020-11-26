@@ -1,3 +1,4 @@
+import { HighScoresComponent } from './high-scores/high-scores.component';
 import { Component, ViewChild, ElementRef, OnInit, HostListener, AfterViewInit } from '@angular/core';
 import {
   COLS,
@@ -10,10 +11,13 @@ import {
   POINTS,
   KEY,
   COLORSDARKER,
+  HighScore,
 } from './constants';
 import { Piece, IPiece } from './piece.component';
 import { GameService } from './game.service';
 import { Zoundfx } from 'ng-zzfx';
+import { MatInput } from '@angular/material/input';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'game-board',
@@ -24,15 +28,19 @@ export class BoardComponent implements AfterViewInit {
   @ViewChild('next', { static: true })
   canvasNext: ElementRef<HTMLCanvasElement>;
   @ViewChild('audioA') set a(ref: ElementRef<HTMLAudioElement>) {
+    ref.nativeElement.loop = true;
     this.audio.A = ref.nativeElement;
   }
 
   @ViewChild('audioB') set b(ref: ElementRef<HTMLAudioElement>) {
+    ref.nativeElement.loop = true;
     this.audio.B = ref.nativeElement;
   }
   @ViewChild('audioC') set c(ref: ElementRef<HTMLAudioElement>) {
+    ref.nativeElement.loop = true;
     this.audio.C = ref.nativeElement;
   }
+  @ViewChild('nameInput') nameInput: MatInput;
 
   selectedTheme: 'A' | 'B' | 'C' | null = 'B';
   selectedDisplayTheme: 'bright' | 'dark' = 'dark';
@@ -54,6 +62,7 @@ export class BoardComponent implements AfterViewInit {
   highScore: number;
   lines: number;
   level: number;
+  highScores: HighScore[];
   moves = {
     [KEY.LEFT]: (p: IPiece): IPiece => ({ ...p, x: p.x - 1 }),
     [KEY.RIGHT]: (p: IPiece): IPiece => ({ ...p, x: p.x + 1 }),
@@ -87,10 +96,12 @@ export class BoardComponent implements AfterViewInit {
     }
   }
 
-  constructor(private service: GameService) {}
+  constructor(private service: GameService, private dialog: MatDialog) {}
 
   ngAfterViewInit() {
     this.initBoard();
+    this.initHighScores();
+    this.initUserName();
     this.initSound();
     this.initNext();
     this.resetGame();
@@ -99,6 +110,37 @@ export class BoardComponent implements AfterViewInit {
 
   initSound() {
     this.playSoundFn = Zoundfx.start(0.2);
+  }
+
+  initUserName() {
+    const name = localStorage.getItem('userName');
+    name ? (this.nameInput.value = name) : false;
+  }
+
+  setName() {
+    localStorage.setItem('userName', this.nameInput.value);
+  }
+
+  initHighScores() {
+    const scores: string = localStorage.getItem('highScores');
+    let highscores: HighScore[] = scores ? JSON.parse(scores) : [];
+    highscores = highscores.sort((a, b) => (b?.points || 0) - (a.points || 0)).filter((x) => x?.points && x?.name);
+    localStorage.setItem('highScores', JSON.stringify(highscores));
+    this.highScores = highscores;
+  }
+
+  setHighScore() {
+    this.highScores.push({
+      date: new Date().toLocaleDateString(),
+      points: this.points,
+      level: this.level,
+      name: this.nameInput.value || '',
+    });
+    localStorage.setItem('highScores', JSON.stringify(this.highScores));
+  }
+
+  get highestScore() {
+    return Math.max(...(this.highScores?.map((x) => x?.points).filter((x) => x) || [0]));
   }
 
   initBoard() {
@@ -125,8 +167,8 @@ export class BoardComponent implements AfterViewInit {
   }
 
   play() {
-    this.gameStarted = true;
     this.resetGame();
+    this.gameStarted = true;
     this.next = new Piece(this.ctx);
     this.piece = new Piece(this.ctx);
     this.next.drawNext(this.ctxNext);
@@ -150,6 +192,7 @@ export class BoardComponent implements AfterViewInit {
   }
 
   resetGame() {
+    this.gameStarted ? this.setHighScore() : false;
     this.points = 0;
     this.lines = 0;
     this.level = 0;
@@ -157,6 +200,15 @@ export class BoardComponent implements AfterViewInit {
     this.time = { start: 0, elapsed: 0, level: LEVEL[this.level] };
     this.paused = false;
     this.addOutlines();
+  }
+
+  showHighscores() {
+    this.dialog.open(HighScoresComponent, {
+      data: this.highScores,
+      maxWidth: '80vw',
+      maxHeight: '80vh',
+      panelClass: 'high-scores',
+    });
   }
 
   animate(now = 0) {
@@ -306,7 +358,7 @@ export class BoardComponent implements AfterViewInit {
       this.audio[this.selectedTheme].pause();
       this.audio[this.selectedTheme].currentTime = 0;
     }
-
+    this.setHighScore();
     this.gameStarted = false;
     cancelAnimationFrame(this.requestId);
     this.highScore = this.points > this.highScore ? this.points : this.highScore;

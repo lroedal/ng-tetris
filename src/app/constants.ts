@@ -12,7 +12,7 @@ export const COLORS = [
   'rgba(255, 0, 255)',
   'rgba(255, 0, 0)',
 ];
-export const COLORSLIGHTER= [
+export const COLORSLIGHTER = [
   'none',
   'rgba(132, 255, 255)',
   'rgba(132, 132, 255)',
@@ -22,7 +22,7 @@ export const COLORSLIGHTER= [
   'rgba(255, 132, 255)',
   'rgba(255, 132, 132)',
 ];
-export const COLORSDARKER= [
+export const COLORSDARKER = [
   'none',
   'rgba(0, 132, 132)',
   'rgba(0, 0, 132)',
@@ -34,13 +34,41 @@ export const COLORSDARKER= [
 ];
 export const SHAPES = [
   [],
-  [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
-  [[2, 0, 0], [2, 2, 2], [0, 0, 0]],
-  [[0, 0, 3], [3, 3, 3], [0, 0, 0]],
-  [[4, 4], [4, 4]],
-  [[0, 5, 5], [5, 5, 0], [0, 0, 0]],
-  [[0, 6, 0], [6, 6, 6], [0, 0, 0]],
-  [[7, 7, 0], [0, 7, 7], [0, 0, 0]]
+  [
+    [0, 0, 0, 0],
+    [1, 1, 1, 1],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+  ],
+  [
+    [2, 0, 0],
+    [2, 2, 2],
+    [0, 0, 0],
+  ],
+  [
+    [0, 0, 3],
+    [3, 3, 3],
+    [0, 0, 0],
+  ],
+  [
+    [4, 4],
+    [4, 4],
+  ],
+  [
+    [0, 5, 5],
+    [5, 5, 0],
+    [0, 0, 0],
+  ],
+  [
+    [0, 6, 0],
+    [6, 6, 6],
+    [0, 0, 0],
+  ],
+  [
+    [7, 7, 0],
+    [0, 7, 7],
+    [0, 0, 0],
+  ],
 ];
 
 export class KEY {
@@ -84,4 +112,11 @@ export class LEVEL {
   static readonly 19 = 30;
   static readonly 20 = 30;
   // 29+ is 20ms
+}
+
+export interface HighScore {
+  name?: string;
+  level?: number;
+  points?: number;
+  date?: string;
 }
