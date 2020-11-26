@@ -140,7 +140,7 @@ export class BoardComponent implements AfterViewInit {
   }
 
   get highestScore() {
-    return Math.max(...(this.highScores?.map((x) => x?.points).filter((x) => x) || [0]));
+    return !this.highScores?.length ? 0 : Math.max(...this.highScores?.map((x) => x?.points).filter((x) => x));
   }
 
   initBoard() {
