@@ -203,12 +203,14 @@ export class BoardComponent implements AfterViewInit {
   }
 
   showHighscores() {
-    this.dialog.open(HighScoresComponent, {
-      data: this.highScores,
-      maxWidth: '80vw',
-      maxHeight: '80vh',
-      panelClass: 'high-scores',
-    });
+    if (this.highScores?.length) {
+      this.dialog.open(HighScoresComponent, {
+        data: this.highScores,
+        maxWidth: '80vw',
+        maxHeight: '80vh',
+        panelClass: 'high-scores',
+      });
+    }
   }
 
   animate(now = 0) {
