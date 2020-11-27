@@ -57,8 +57,7 @@
   <audio #audioA id="audio" src="/assets/theme-a.ogx" preload="auto"></audio>
   <audio #audioB id="audio" src="/assets/theme-b.opus" preload="auto"></audio>
   <audio #audioC id="audio" src="/assets/theme-c.opus" preload="auto"></audio>
-  <div style="padding: 20px; min-height: calc(100vh - 136px)" class="grid">
-    <div class="placeholder"></div>
+  <div style="padding: 20px; min-height: calc(100vh - 136px); display: flex; flex: 1; justify-content: center">
     <canvas style="background: var(--secondary-background)" #board class="game-board"></canvas>
     <div class="right-column">
       <div>
@@ -72,7 +71,6 @@
         <canvas #next class="next"></canvas>
       </div>
     </div>
-    <div class="placeholder"></div>
   </div>
 
   <mat-toolbar

@@ -29,20 +29,17 @@
   font-family: 'Press Start 2P', cursive;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 320px 200px 1fr;
-}
-
 .right-column {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  width: 300px;
+  width: 185px;
+  margin: 10px;
 }
 
 .game-board {
   border: solid 2px;
+  margin: 10px;
 }
 
 .button-container {
