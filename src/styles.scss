@@ -37,9 +37,28 @@
   margin: 10px;
 }
 
+.game-inputs {
+  button {
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+    font-size: 60px;
+    mat-icon {
+      width: 60px;
+      height: 60px;
+      line-height: 60px;
+      font-size: 60px;
+
+      display: flex;
+      align-items: center;
+    }
+  }
+}
+
 .game-board {
   border: solid 2px;
   margin: 10px;
+  align-self: flex-start;
 }
 
 .button-container {

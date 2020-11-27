@@ -74,13 +74,17 @@ export class BoardComponent implements AfterViewInit {
 
   @HostListener('window:keydown', ['$event'])
   keyEvent(event: KeyboardEvent) {
-    if (event.keyCode === KEY.ESC) {
+    this.move(event.keyCode, event);
+  }
+
+  move(keyCode, event?) {
+    if (keyCode === KEY.ESC) {
       this.gameOver();
-    } else if (this.moves[event.keyCode]) {
-      event.preventDefault();
+    } else if (this.moves[keyCode]) {
+      event?.preventDefault();
       // Get new state
-      let p = this.moves[event.keyCode](this.piece);
-      if (event.keyCode === KEY.SPACE) {
+      let p = this.moves[keyCode](this.piece);
+      if (keyCode === KEY.SPACE) {
         // Hard drop
         while (this.service.valid(p, this.board)) {
           this.points += POINTS.HARD_DROP;
@@ -89,7 +93,7 @@ export class BoardComponent implements AfterViewInit {
         }
       } else if (this.service.valid(p, this.board)) {
         this.piece.move(p);
-        if (event.keyCode === KEY.DOWN) {
+        if (keyCode === KEY.DOWN) {
           this.points += POINTS.SOFT_DROP;
         }
       }
