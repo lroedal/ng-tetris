@@ -65,6 +65,16 @@
         #board
         class="game-board"
       ></canvas>
+      <article
+        class="game-inputs"
+        style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; grid-template-rows: 1fr"
+      >
+        <button mat-icon-button class="button" (click)="move(38)"><mat-icon>keyboard_arrow_up</mat-icon></button>
+        <button mat-icon-button class="button" (click)="move(40)"><mat-icon>keyboard_arrow_down</mat-icon></button>
+        <button mat-icon-button class="button" (click)="move(32)"><mat-icon> arrow_drop_down_circle</mat-icon></button>
+        <button mat-icon-button class="button" (click)="move(37)"><mat-icon>keyboard_arrow_left</mat-icon></button>
+        <button mat-icon-button class="button" (click)="move(39)"><mat-icon>keyboard_arrow_right</mat-icon></button>
+      </article>
     </div>
     <div style="display: block; width: fit-content; height: fit-content" #info class="right-column">
       <div #infoContainer>
@@ -76,19 +86,6 @@
         <p>{{ highScore }}</p>
         <p>Next Block:</p>
         <canvas #next class="next"></canvas>
-
-        <article
-          class="game-inputs"
-          style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; row-gap: 2em"
-        >
-          <button mat-icon-button class="button" (click)="move(38)"><mat-icon>keyboard_arrow_up</mat-icon></button>
-          <button mat-icon-button class="button" (click)="move(40)"><mat-icon>keyboard_arrow_down</mat-icon></button>
-          <button mat-icon-button class="button" (click)="move(37)"><mat-icon>keyboard_arrow_left</mat-icon></button>
-          <button mat-icon-button class="button" (click)="move(39)"><mat-icon>keyboard_arrow_right</mat-icon></button>
-          <button style="grid-column: 1 / span 2" mat-icon-button class="button" (click)="move(32)">
-            <mat-icon> arrow_drop_down_circle</mat-icon>
-          </button>
-        </article>
       </div>
     </div>
   </div>

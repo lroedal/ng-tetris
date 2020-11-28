@@ -41,7 +41,7 @@ export class BoardComponent implements AfterViewInit {
     this.audio.C = ref.nativeElement;
   }
   @ViewChild('nameInput') nameInput: MatInput;
-
+  @ViewChild('parent') wrapper: ElementRef;
   selectedTheme: 'A' | 'B' | 'C' | null = 'B';
   selectedDisplayTheme: 'bright' | 'dark' = 'dark';
   audio: {
@@ -117,8 +117,10 @@ export class BoardComponent implements AfterViewInit {
     const factors = { height: p.orgHeight / c.orgHeight, width: p.orgWidth / c.orgWidth };
     const diffH = (c.orgHeight - toTransform.clientHeight) * factors.height * 2;
     const diffW = (c.orgWidth - toTransform.clientWidth) * factors.width;
+
+    return {};
     return {
-      transform: `scale(${factors.height}) translateY(${diffH}px) translateX(-${diffW}px)`,
+      transform: `scale(${factors.height}) translateY(${diffH - 60}px) translateX(-${diffW}px)`,
     };
   }
 
@@ -169,15 +171,21 @@ export class BoardComponent implements AfterViewInit {
     return !this.highScores?.length ? 0 : Math.max(...this.highScores?.map((x) => x?.points).filter((x) => x));
   }
 
+  blockSize;
   initBoard() {
     this.ctx = this.canvas.nativeElement.getContext('2d');
 
+    const height = (this.wrapper.nativeElement as HTMLDivElement).getBoundingClientRect().height - 130;
+    const width = (this.wrapper.nativeElement as HTMLDivElement).getBoundingClientRect().width;
+
+    this.blockSize = Math.min(width / COLS, height / ROWS);
+
     // Calculate size of canvas from constants.
-    this.ctx.canvas.width = COLS * BLOCK_SIZE;
-    this.ctx.canvas.height = ROWS * BLOCK_SIZE;
+    this.ctx.canvas.width = COLS * this.blockSize;
+    this.ctx.canvas.height = ROWS * this.blockSize;
 
     // Scale so we don't need to give size on every draw.
-    this.ctx.scale(BLOCK_SIZE, BLOCK_SIZE);
+    this.ctx.scale(this.blockSize, this.blockSize);
   }
 
   initNext() {
@@ -186,10 +194,10 @@ export class BoardComponent implements AfterViewInit {
     // Calculate size of canvas from constants.
     // The + 2 is to allow for space to add the drop shadow to
     // the "next piece"
-    this.ctxNext.canvas.width = 4 * BLOCK_SIZE + 2;
-    this.ctxNext.canvas.height = 4 * BLOCK_SIZE;
+    this.ctxNext.canvas.width = 4 * this.blockSize + 2;
+    this.ctxNext.canvas.height = 4 * this.blockSize;
 
-    this.ctxNext.scale(BLOCK_SIZE, BLOCK_SIZE);
+    this.ctxNext.scale(this.blockSize, this.blockSize);
   }
 
   play() {
