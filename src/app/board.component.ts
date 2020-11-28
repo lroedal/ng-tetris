@@ -100,6 +100,28 @@ export class BoardComponent implements AfterViewInit {
     }
   }
 
+  calculateSize(parent: HTMLDivElement, child: HTMLDivElement, toTransform: HTMLElement) {
+    const p = {
+      orgHeight: parent.getBoundingClientRect().height,
+      orgWidth: parent.getBoundingClientRect().width,
+    };
+    const c = {
+      orgHeight: child.getBoundingClientRect().height,
+      orgWidth: child.getBoundingClientRect().width,
+    };
+    const t = {
+      orgHeight: toTransform.getBoundingClientRect().height,
+      orgWidth: toTransform.getBoundingClientRect().width,
+    };
+
+    const factors = { height: p.orgHeight / c.orgHeight, width: p.orgWidth / c.orgWidth };
+    const diffH = (c.orgHeight - toTransform.clientHeight) * factors.height * 2;
+    const diffW = (c.orgWidth - toTransform.clientWidth) * factors.width;
+    return {
+      transform: `scale(${factors.height}) translateY(${diffH}px) translateX(-${diffW}px)`,
+    };
+  }
+
   constructor(private service: GameService, private dialog: MatDialog) {}
 
   ngAfterViewInit() {
