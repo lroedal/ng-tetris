@@ -13,8 +13,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { HighScoresComponent } from './high-scores/high-scores.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { ConfigComponent } from './config/config.component';
 @NgModule({
-  declarations: [AppComponent, BoardComponent, HighScoresComponent],
+  declarations: [AppComponent, BoardComponent, HighScoresComponent, ConfigComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,

@@ -1,23 +1,23 @@
-import { HighScoresComponent } from './high-scores/high-scores.component';
-import { Component, ViewChild, ElementRef, OnInit, HostListener, AfterViewInit } from '@angular/core';
-import {
-  COLS,
-  BLOCK_SIZE,
-  ROWS,
-  COLORS,
-  COLORSLIGHTER,
-  LINES_PER_LEVEL,
-  LEVEL,
-  POINTS,
-  KEY,
-  COLORSDARKER,
-  HighScore,
-} from './constants';
-import { Piece, IPiece } from './piece.component';
-import { GameService } from './game.service';
-import { Zoundfx } from 'ng-zzfx';
-import { MatInput } from '@angular/material/input';
+import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { Zoundfx } from 'ng-zzfx';
+import { Config, ConfigComponent } from './config/config.component';
+import {
+  BLOCK_SIZE,
+  COLORS,
+  COLORSDARKER,
+  COLORSLIGHTER,
+  COLS,
+  HighScore,
+  KEY,
+  LEVEL,
+  LINES_PER_LEVEL,
+  POINTS,
+  ROWS,
+} from './constants';
+import { GameService } from './game.service';
+import { HighScoresComponent } from './high-scores/high-scores.component';
+import { IPiece, Piece } from './piece.component';
 
 @Component({
   selector: 'game-board',
@@ -40,10 +40,10 @@ export class BoardComponent implements AfterViewInit {
     ref.nativeElement.loop = true;
     this.audio.C = ref.nativeElement;
   }
-  @ViewChild('nameInput') nameInput: MatInput;
   @ViewChild('parent') wrapper: ElementRef;
-  selectedTheme: 'A' | 'B' | 'C' | null = 'B';
-  selectedDisplayTheme: 'bright' | 'dark' = 'dark';
+
+  config: Config = { selectedMusicTheme: 'B', selectedDisplayTheme: 'dark' };
+
   audio: {
     A?: HTMLAudioElement;
     B?: HTMLAudioElement;
@@ -100,30 +100,6 @@ export class BoardComponent implements AfterViewInit {
     }
   }
 
-  calculateSize(parent: HTMLDivElement, child: HTMLDivElement, toTransform: HTMLElement) {
-    const p = {
-      orgHeight: parent.getBoundingClientRect().height,
-      orgWidth: parent.getBoundingClientRect().width,
-    };
-    const c = {
-      orgHeight: child.getBoundingClientRect().height,
-      orgWidth: child.getBoundingClientRect().width,
-    };
-    const t = {
-      orgHeight: toTransform.getBoundingClientRect().height,
-      orgWidth: toTransform.getBoundingClientRect().width,
-    };
-
-    const factors = { height: p.orgHeight / c.orgHeight, width: p.orgWidth / c.orgWidth };
-    const diffH = (c.orgHeight - toTransform.clientHeight) * factors.height * 2;
-    const diffW = (c.orgWidth - toTransform.clientWidth) * factors.width;
-
-    return {};
-    return {
-      transform: `scale(${factors.height}) translateY(${diffH - 60}px) translateX(-${diffW}px)`,
-    };
-  }
-
   constructor(private service: GameService, private dialog: MatDialog) {}
 
   ngAfterViewInit() {
@@ -142,11 +118,7 @@ export class BoardComponent implements AfterViewInit {
 
   initUserName() {
     const name = localStorage.getItem('userName');
-    name ? (this.nameInput.value = name) : false;
-  }
-
-  setName() {
-    localStorage.setItem('userName', this.nameInput.value);
+    this.config.userName = name || ' Anonymous';
   }
 
   initHighScores() {
@@ -162,7 +134,7 @@ export class BoardComponent implements AfterViewInit {
       date: new Date().toLocaleDateString(),
       points: this.points,
       level: this.level,
-      name: this.nameInput.value || '',
+      name: this.config.userName || '',
     });
     localStorage.setItem('highScores', JSON.stringify(this.highScores));
   }
@@ -191,13 +163,14 @@ export class BoardComponent implements AfterViewInit {
   initNext() {
     this.ctxNext = this.canvasNext.nativeElement.getContext('2d');
 
+    const blockSize = Math.min(this.blockSize, BLOCK_SIZE);
     // Calculate size of canvas from constants.
     // The + 2 is to allow for space to add the drop shadow to
     // the "next piece"
-    this.ctxNext.canvas.width = 4 * this.blockSize + 2;
-    this.ctxNext.canvas.height = 4 * this.blockSize;
+    this.ctxNext.canvas.width = 4 * blockSize + 2;
+    this.ctxNext.canvas.height = 4 * blockSize;
 
-    this.ctxNext.scale(this.blockSize, this.blockSize);
+    this.ctxNext.scale(blockSize, blockSize);
   }
 
   play() {
@@ -214,16 +187,16 @@ export class BoardComponent implements AfterViewInit {
     }
 
     this.animate();
-    if (this.selectedTheme) {
-      this.audio[this.selectedTheme].play();
-      this.audio[this.selectedTheme].volume = 1;
+    if (this.config.selectedMusicTheme) {
+      this.audio[this.config.selectedMusicTheme].play();
+      this.audio[this.config.selectedMusicTheme].volume = 1;
     }
   }
-
+  /* 
   themeChanged(theme: 'A' | 'B' | 'C') {
     this.selectedTheme = theme;
     ['A', 'B', 'C'].forEach((k) => (this.audio[k].currentTime = 0));
-  }
+  } */
 
   resetGame() {
     this.gameStarted ? this.setHighScore() : false;
@@ -376,23 +349,39 @@ export class BoardComponent implements AfterViewInit {
     if (this.gameStarted) {
       if (this.paused) {
         this.animate();
-        this.audio[this.selectedTheme]?.play();
+        this.audio[this.config.selectedMusicTheme]?.play();
       } else {
         this.ctx.font = '1px Arial';
         this.ctx.fillStyle = 'black';
         this.ctx.fillText('GAME PAUSED', 1.4, 4);
         cancelAnimationFrame(this.requestId);
-        this.audio[this.selectedTheme]?.pause();
+        this.audio[this.config.selectedMusicTheme]?.pause();
       }
 
       this.paused = !this.paused;
     }
   }
 
+  openConfig() {
+    const copy = JSON.parse(JSON.stringify(this.config));
+    this.dialog
+      .open(ConfigComponent, { data: this.config, panelClass: 'config', disableClose: true })
+      .afterClosed()
+      .subscribe((x) => {
+        if (!x) {
+          this.config = copy;
+        } else {
+          if (this.config.selectedMusicTheme != copy.selectedMusicTheme) {
+            ['A', 'B', 'C'].forEach((k) => (this.audio[k].currentTime = 0));
+          }
+        }
+      });
+  }
+
   gameOver() {
-    if (this.selectedTheme) {
-      this.audio[this.selectedTheme].pause();
-      this.audio[this.selectedTheme].currentTime = 0;
+    if (this.config.selectedMusicTheme) {
+      this.audio[this.config.selectedMusicTheme].pause();
+      this.audio[this.config.selectedMusicTheme].currentTime = 0;
     }
     this.setHighScore();
     this.gameStarted = false;

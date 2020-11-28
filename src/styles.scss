@@ -12,7 +12,8 @@
   --secondary-background-contrast: #545454;
 }
 
-.cdk-overlay-pane.high-scores > mat-dialog-container {
+.cdk-overlay-pane.high-scores > mat-dialog-container,
+.cdk-overlay-pane.config > mat-dialog-container {
   padding: 0;
 }
 

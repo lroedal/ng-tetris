@@ -1,0 +1,38 @@
+<div style="display: grid; grid-template-rows: auto auto auto auto auto; row-gap: 20px">
+  <div>
+    <span class="title">Name</span>
+    <mat-form-field [floatLabel]="'never'">
+      <mat-label>Name</mat-label>
+      <input #nameInput="matInput" matInput #userName (blur)="setName()" />
+    </mat-form-field>
+  </div>
+
+  <div>
+    <span class="title">Music</span>
+    <mat-radio-group
+      style="min-height: 125px; display: flex; flex-direction: column"
+      (change)="data.selectedMusicTheme = $event?.value"
+      [value]="data?.selectedMusicTheme"
+    >
+      <mat-radio-button style="padding: 5px" value="A">Theme A</mat-radio-button>
+      <mat-radio-button style="padding: 5px" value="B">Theme B</mat-radio-button>
+      <mat-radio-button style="padding: 5px" value="C">Theme C</mat-radio-button>
+      <mat-radio-button style="padding: 5px" [value]="null">None</mat-radio-button>
+    </mat-radio-group>
+  </div>
+
+  <div>
+    <span class="title">Display</span>
+    <mat-radio-group
+      style="display: flex; flex-direction: column"
+      (change)="data.selectedDisplayTheme = $event?.value"
+      [value]="data?.selectedDisplayTheme"
+    >
+      <mat-radio-button style="padding: 5px" value="dark">Dark</mat-radio-button>
+      <mat-radio-button style="padding: 5px" value="bright">Bright</mat-radio-button>
+    </mat-radio-group>
+  </div>
+
+  <button mat-flat-button (click)="close()">Cancel</button>
+  <button mat-flat-button (click)="save()">Save</button>
+</div>

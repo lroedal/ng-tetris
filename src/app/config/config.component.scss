@@ -1,0 +1,12 @@
+app-config {
+  display: block;
+  padding: 20px;
+  background: var(--secondary-background);
+  color: var(--secondary-background-contrast);
+
+  span.title {
+    display: block;
+    border-bottom: 1px solid var(--primary-background);
+    padding: 3px;
+  }
+}

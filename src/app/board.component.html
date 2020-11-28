@@ -1,73 +1,39 @@
 <div
-  [class]="selectedDisplayTheme"
+  [class]="config?.selectedDisplayTheme"
   style="min-height: 100vh; background: var(--primary-background); color: var(--primary-background-contrast)"
 >
   <mat-toolbar
     style="
       display: grid;
-      grid-template-columns: auto auto auto auto auto auto 1fr auto;
+      grid-template-columns: auto auto auto 1fr auto auto;
       column-gap: 20px;
       align-content: center;
       background: var(--secondary-background);
       color: var(--secondary-background-contrast);
     "
   >
-    <button mat-flat-button (click)="play()" class="play-button button" [disabled]="gameStarted">Play</button>
-    <button [disabled]="!gameStarted" mat-flat-button (click)="gameOver()" class="reset-button button">Reset</button>
-    <button mat-flat-button [disabled]="!gameStarted" (click)="pause()" class="pause-button button">Pause</button>
-    <button mat-flat-button [disabled]="gameStarted && !paused" [matMenuTriggerFor]="musicMenu" class="button">
-      Music
-    </button>
-    <button mat-flat-button [disabled]="gameStarted && !paused" [matMenuTriggerFor]="displayThemeMenu" class="button">
-      Theme
-    </button>
-    <mat-form-field [floatLabel]="'never'">
-      <mat-label>Name</mat-label>
-      <input #nameInput="matInput" matInput #userName (blur)="setName()" />
-    </mat-form-field>
+    <button mat-flat-button (click)="play()" [disabled]="gameStarted">Play</button>
+    <button [disabled]="!gameStarted" mat-flat-button (click)="gameOver()">Reset</button>
+    <button mat-flat-button [disabled]="!gameStarted" (click)="pause()">Pause</button>
     <span class="placeholder"></span>
     <span [class.clickable]="!!highScores?.length" (click)="showHighscores()">High Score: {{ highestScore }}</span>
+    <button mat-flat-button (click)="openConfig()" [disabled]="gameStarted">Config</button>
   </mat-toolbar>
-
-  <mat-menu #musicMenu="matMenu">
-    <mat-radio-group
-      style="min-height: 125px; display: flex; flex-direction: column"
-      (change)="themeChanged($event?.value)"
-      [value]="selectedTheme"
-      fxLayout="column"
-    >
-      <mat-radio-button style="padding: 5px" value="A">Theme A</mat-radio-button>
-      <mat-radio-button style="padding: 5px" value="B">Theme B</mat-radio-button>
-      <mat-radio-button style="padding: 5px" value="C">Theme C</mat-radio-button>
-      <mat-radio-button style="padding: 5px" [value]="null">None</mat-radio-button>
-    </mat-radio-group>
-  </mat-menu>
-  <mat-menu #displayThemeMenu="matMenu">
-    <mat-radio-group
-      style="display: flex; flex-direction: column"
-      (change)="selectedDisplayTheme = $event?.value"
-      [value]="selectedDisplayTheme"
-      fxLayout="column"
-    >
-      <mat-radio-button style="padding: 5px" value="dark">Dark</mat-radio-button>
-      <mat-radio-button style="padding: 5px" value="bright">Bright</mat-radio-button>
-    </mat-radio-group>
-  </mat-menu>
 
   <audio #audioA id="audio" src="/assets/theme-a.ogx" preload="auto"></audio>
   <audio #audioB id="audio" src="/assets/theme-b.opus" preload="auto"></audio>
   <audio #audioC id="audio" src="/assets/theme-c.opus" preload="auto"></audio>
   <div #parent style="padding: 20px; min-height: calc(100vh - 136px); display: flex; flex: 1; justify-content: center">
     <div style="display: block; width: fit-content; height: fit-content" #game>
-      <canvas
-        [ngStyle]="calculateSize(parent, game, board)"
-        style="background: var(--secondary-background)"
-        #board
-        class="game-board"
-      ></canvas>
+      <canvas style="background: var(--secondary-background)" #board class="game-board"></canvas>
       <article
         class="game-inputs"
-        style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; grid-template-rows: 1fr"
+        style="
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+          grid-template-rows: 1fr;
+          touch-action: manipulation;
+        "
       >
         <button mat-icon-button class="button" (click)="move(38)"><mat-icon>keyboard_arrow_up</mat-icon></button>
         <button mat-icon-button class="button" (click)="move(40)"><mat-icon>keyboard_arrow_down</mat-icon></button>
