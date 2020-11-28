@@ -188,6 +188,7 @@ export class BoardComponent implements AfterViewInit {
 
     this.animate();
     if (this.config.selectedMusicTheme) {
+      this.audio[this.config.selectedMusicTheme].muted = false;
       this.audio[this.config.selectedMusicTheme].play();
       this.audio[this.config.selectedMusicTheme].volume = 1;
     }
@@ -349,6 +350,7 @@ export class BoardComponent implements AfterViewInit {
     if (this.gameStarted) {
       if (this.paused) {
         this.animate();
+        this.audio[this.config.selectedMusicTheme].muted = false;
         this.audio[this.config.selectedMusicTheme]?.play();
       } else {
         this.ctx.font = '1px Arial';
