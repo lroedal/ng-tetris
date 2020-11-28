@@ -174,6 +174,10 @@ export class BoardComponent implements AfterViewInit {
   }
 
   play() {
+    ['A', 'B', 'C'].forEach((k) => {
+      this.audio[k].pause();
+      this.audio[k].currentTime = 0;
+    });
     this.resetGame();
     this.gameStarted = true;
     this.next = new Piece(this.ctx);
@@ -193,11 +197,6 @@ export class BoardComponent implements AfterViewInit {
       this.audio[this.config.selectedMusicTheme].volume = 1;
     }
   }
-  /* 
-  themeChanged(theme: 'A' | 'B' | 'C') {
-    this.selectedTheme = theme;
-    ['A', 'B', 'C'].forEach((k) => (this.audio[k].currentTime = 0));
-  } */
 
   resetGame() {
     this.gameStarted ? this.setHighScore() : false;
