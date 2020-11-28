@@ -1,8 +1,18 @@
 # ng-tetris
 
-Tetris game in Angular. [Play it now!](https://focused-mestorf-930f82.netlify.com/)
+Tetris game in Angular. [Play it now!](http://tetris.lroedal.net/)
 
-![tetris picture](src/assets/share-image-large.png)
+Forked from [melcor76/ng-tetris](https://github.com/melcor76/ng-tetris).
+
+Added:
+
+- Theme support
+- Music
+- Buttons for mobile support
+- High score and list which saves to local storage
+- Settings saved in local storage
+
+![tetris picture](src/assets/tetris.PNG)
 
 ## Development server
 
@@ -11,5 +21,3 @@ Run `npm start` for a dev server. Navigate to `http://localhost:4200/`. The app 
 ## Build
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-
