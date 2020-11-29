@@ -9,6 +9,7 @@ Added:
 - Theme support
 - Music
 - Buttons for mobile support
+- Supports touch (swipe in any direction will count as pressing the arrow key in that direction. Double clicking will 'drop' the current piece)
 - High score and list which saves to local storage
 - Settings saved in local storage
 
