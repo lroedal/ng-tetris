@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Zoundfx } from 'ng-zzfx';
+import { Subscription, timer } from 'rxjs';
 import { Config, ConfigComponent } from './config/config.component';
 import {
   BLOCK_SIZE,
@@ -209,6 +210,7 @@ export class BoardComponent implements AfterViewInit {
   threshold = 150; //required min distance traveled to be considered swipe
   restraint = 100; // maximum distance allowed at the same time in perpendicular direction
   allowedTime = 300; // maximum time allowed to travel that distance
+  clicked: boolean;
   canvasTouchStarted(e) {
     const touchobj = e.changedTouches[0];
     this.swipedir = 'none';
@@ -232,6 +234,14 @@ export class BoardComponent implements AfterViewInit {
       } else if (Math.abs(this.distY) >= this.threshold && Math.abs(this.distX) <= this.restraint) {
         // 2nd condition for vertical swipe met
         this.swipedir = this.distY < 0 ? 'up' : 'down'; // if dist traveled is negative, it indicates up swipe
+      } else {
+        if (this.clicked) {
+          this.move(32);
+          this.clicked = false;
+        } else {
+          this.clicked = true;
+          timer(200).subscribe(() => (this.clicked = false));
+        }
       }
     }
     this.handleSwipe(this.swipedir);
