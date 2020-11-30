@@ -16,7 +16,9 @@
     <button [disabled]="!gameStarted" mat-flat-button (click)="gameOver()">Reset</button>
     <button mat-flat-button [disabled]="!gameStarted" (click)="pause()">Pause</button>
     <span class="placeholder"></span>
-    <span [class.clickable]="!!highScores?.length" (click)="showHighscores()">High Score: {{ highestScore }}</span>
+    <span [class.clickable]="!!config?.highScores?.length" (click)="showHighscores()"
+      >High Score: {{ highestScore }}</span
+    >
     <button mat-flat-button (click)="openConfig()" [disabled]="gameStarted">Config</button>
   </mat-toolbar>
 
@@ -44,11 +46,13 @@
           touch-action: manipulation;
         "
       >
-        <button mat-icon-button class="button" (click)="move(38)"><mat-icon>keyboard_arrow_up</mat-icon></button>
-        <button mat-icon-button class="button" (click)="move(40)"><mat-icon>keyboard_arrow_down</mat-icon></button>
-        <button mat-icon-button class="button" (click)="move(32)"><mat-icon> arrow_drop_down_circle</mat-icon></button>
-        <button mat-icon-button class="button" (click)="move(37)"><mat-icon>keyboard_arrow_left</mat-icon></button>
-        <button mat-icon-button class="button" (click)="move(39)"><mat-icon>keyboard_arrow_right</mat-icon></button>
+        <button mat-icon-button class="button" (click)="rotate()"><mat-icon>keyboard_arrow_up</mat-icon></button>
+        <button mat-icon-button class="button" (click)="moveDown()"><mat-icon>keyboard_arrow_down</mat-icon></button>
+        <button mat-icon-button class="button" (click)="dropPiece()">
+          <mat-icon> arrow_drop_down_circle</mat-icon>
+        </button>
+        <button mat-icon-button class="button" (click)="moveLeft()"><mat-icon>keyboard_arrow_left</mat-icon></button>
+        <button mat-icon-button class="button" (click)="moveRight()"><mat-icon>keyboard_arrow_right</mat-icon></button>
       </article>
     </div>
     <div style="display: block; width: fit-content; height: fit-content" #info class="right-column">
