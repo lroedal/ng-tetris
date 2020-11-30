@@ -1,7 +1,8 @@
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Zoundfx } from 'ng-zzfx';
-import { Subscription, timer } from 'rxjs';
+import { timer } from 'rxjs';
+import { Key } from 'ts-key-enum';
 import { Config, ConfigComponent } from './config/config.component';
 import {
   BLOCK_SIZE,
@@ -9,8 +10,6 @@ import {
   COLORSDARKER,
   COLORSLIGHTER,
   COLS,
-  HighScore,
-  KEY,
   LEVEL,
   LINES_PER_LEVEL,
   POINTS,
@@ -20,6 +19,7 @@ import { GameService } from './game.service';
 import { HighScoresComponent } from './high-scores/high-scores.component';
 import { IPiece, Piece } from './piece.component';
 
+type Swipe = 'up' | 'down' | 'left' | 'right' | 'none';
 @Component({
   selector: 'game-board',
   templateUrl: 'board.component.html',
@@ -63,85 +63,112 @@ export class BoardComponent implements AfterViewInit {
   highScore: number;
   lines: number;
   level: number;
-  highScores: HighScore[];
   moves = {
-    [KEY.LEFT]: (p: IPiece): IPiece => ({ ...p, x: p.x - 1 }),
-    [KEY.RIGHT]: (p: IPiece): IPiece => ({ ...p, x: p.x + 1 }),
-    [KEY.DOWN]: (p: IPiece): IPiece => ({ ...p, y: p.y + 1 }),
-    [KEY.SPACE]: (p: IPiece): IPiece => ({ ...p, y: p.y + 1 }),
-    [KEY.UP]: (p: IPiece): IPiece => this.service.rotate(p),
+    [Key.ArrowLeft]: (p: IPiece): IPiece => ({ ...p, x: p.x - 1 }),
+    [Key.ArrowRight]: (p: IPiece): IPiece => ({ ...p, x: p.x + 1 }),
+    [Key.ArrowDown]: (p: IPiece): IPiece => ({ ...p, y: p.y + 1 }),
+    ['Space']: (p: IPiece): IPiece => ({ ...p, y: p.y + 1 }),
+    [Key.ArrowUp]: (p: IPiece): IPiece => this.service.rotate(p),
   };
   playSoundFn: Function;
 
   @HostListener('window:keydown', ['$event'])
   keyEvent(event: KeyboardEvent) {
-    this.move(event.keyCode, event);
+    this.move(event.code, event);
   }
 
-  move(keyCode, event?) {
-    if (keyCode === KEY.ESC) {
+  rotate() {
+    this.move(Key.ArrowUp);
+  }
+
+  moveLeft() {
+    this.move(Key.ArrowLeft);
+  }
+
+  moveRight() {
+    this.move(Key.ArrowRight);
+  }
+
+  moveDown() {
+    this.move(Key.ArrowDown);
+  }
+
+  dropPiece() {
+    this.move('Space');
+  }
+
+  move(keyCode, event?: KeyboardEvent) {
+    console.log(event);
+    if (keyCode === Key.Escape) {
       this.gameOver();
     } else if (this.moves[keyCode]) {
       event?.preventDefault();
       // Get new state
       let p = this.moves[keyCode](this.piece);
-      if (keyCode === KEY.SPACE) {
+      if (keyCode === 'Space') {
         // Hard drop
         while (this.service.valid(p, this.board)) {
           this.points += POINTS.HARD_DROP;
           this.piece.move(p);
-          p = this.moves[KEY.DOWN](this.piece);
+          p = this.moves[Key.ArrowDown](this.piece);
         }
       } else if (this.service.valid(p, this.board)) {
         this.piece.move(p);
-        if (keyCode === KEY.DOWN) {
+        if (keyCode === Key.ArrowDown) {
           this.points += POINTS.SOFT_DROP;
         }
       }
     }
   }
 
+  handleSwipe(swipe: Swipe) {
+    swipe === 'up'
+      ? this.rotate()
+      : swipe === 'down'
+      ? this.moveDown()
+      : swipe === 'left'
+      ? this.moveLeft()
+      : swipe === 'right'
+      ? this.moveRight()
+      : false;
+  }
+
   constructor(private service: GameService, private dialog: MatDialog) {}
 
   ngAfterViewInit() {
+    this.initConfig();
     this.initBoard();
-    this.initHighScores();
-    this.initUserName();
-    this.initSound();
     this.initNext();
     this.resetGame();
     this.highScore = 0;
   }
 
-  initSound() {
+  initConfig() {
     this.playSoundFn = Zoundfx.start(0.2);
-  }
 
-  initUserName() {
-    const name = localStorage.getItem('userName');
-    this.config.userName = name || ' Anonymous';
-  }
-
-  initHighScores() {
-    const scores: string = localStorage.getItem('highScores');
-    let highscores: HighScore[] = scores ? JSON.parse(scores) : [];
-    highscores = highscores.sort((a, b) => (b?.points || 0) - (a.points || 0)).filter((x) => x?.points && x?.name);
-    localStorage.setItem('highScores', JSON.stringify(highscores));
-    this.highScores = highscores;
+    const config = localStorage.getItem('config');
+    if (!config) {
+      this.config = { selectedDisplayTheme: 'dark', selectedMusicTheme: 'A', userName: 'Anonymous', highScores: [] };
+    } else {
+      this.config = JSON.parse(config);
+    }
   }
 
   setHighScore() {
-    this.highScores.push({
+    this.config.highScores.push({
       date: new Date().toLocaleDateString(),
       points: this.points,
       level: this.level,
       name: this.config.userName || '',
     });
-    localStorage.setItem('highScores', JSON.stringify(this.highScores));
+    this.config.highScores.sort((a, b) => (b?.points || 0) - (a.points || 0)).filter((x) => x?.points && x?.name);
+    localStorage.setItem('config', JSON.stringify(this.config));
   }
 
   get highestScore() {
-    return !this.highScores?.length ? 0 : Math.max(...this.highScores?.map((x) => x?.points).filter((x) => x));
+    return !this.config?.highScores?.length
+      ? 0
+      : Math.max(...this.config.highScores?.map((x) => x?.points).filter((x) => x));
   }
 
   blockSize;
@@ -199,22 +226,12 @@ export class BoardComponent implements AfterViewInit {
     }
   }
 
-  swipedir;
-  dist;
   startX;
   startY;
   startTime;
-  distX;
-  distY;
-  elapsedTime;
-  threshold = 150; //required min distance traveled to be considered swipe
-  restraint = 100; // maximum distance allowed at the same time in perpendicular direction
-  allowedTime = 300; // maximum time allowed to travel that distance
   clicked: boolean;
   canvasTouchStarted(e) {
     const touchobj = e.changedTouches[0];
-    this.swipedir = 'none';
-    this.dist = 0;
     this.startX = touchobj.pageX;
     this.startY = touchobj.pageY;
     this.startTime = new Date().getTime(); // record time when finger first makes contact with surface
@@ -222,18 +239,22 @@ export class BoardComponent implements AfterViewInit {
   }
 
   canvasTouchEnded(e) {
+    // Threshold: Min. distance to count as swipe | Restraint: Max. distance allowed at same time in perpendicular direction | Allowed Time: Max. time allowed to travel distance
+    const config = { threshold: 150, restraint: 100, allowedTime: 300 };
     const touchobj = e.changedTouches[0];
-    this.distX = touchobj.pageX - this.startX; // get horizontal dist traveled by finger while in contact with surface
-    this.distY = touchobj.pageY - this.startY; // get vertical dist traveled by finger while in contact with surface
-    this.elapsedTime = new Date().getTime() - this.startTime; // get time elapsed
-    if (this.elapsedTime <= this.allowedTime) {
-      // first condition for awipe met
-      if (Math.abs(this.distX) >= this.threshold && Math.abs(this.distY) <= this.restraint) {
+    let swipeDirection: Swipe = 'none';
+    const distX = touchobj.pageX - this.startX; // get horizontal dist traveled by finger while in contact with surface
+    const distY = touchobj.pageY - this.startY; // get vertical dist traveled by finger while in contact with surface
+    const elapsedTime = new Date().getTime() - this.startTime; // get time elapsed
+
+    if (elapsedTime <= config.allowedTime) {
+      // first condition for swipe met
+      if (Math.abs(distX) >= config.threshold && Math.abs(distY) <= config.restraint) {
         // 2nd condition for horizontal swipe met
-        this.swipedir = this.distX < 0 ? 'left' : 'right'; // if dist traveled is negative, it indicates left swipe
-      } else if (Math.abs(this.distY) >= this.threshold && Math.abs(this.distX) <= this.restraint) {
+        swipeDirection = distX < 0 ? 'left' : 'right'; // if dist traveled is negative, it indicates left swipe
+      } else if (Math.abs(distY) >= config.threshold && Math.abs(distX) <= config.restraint) {
         // 2nd condition for vertical swipe met
-        this.swipedir = this.distY < 0 ? 'up' : 'down'; // if dist traveled is negative, it indicates up swipe
+        swipeDirection = distY < 0 ? 'up' : 'down'; // if dist traveled is negative, it indicates up swipe
       } else {
         if (this.clicked) {
           this.move(32);
@@ -244,20 +265,8 @@ export class BoardComponent implements AfterViewInit {
         }
       }
     }
-    this.handleSwipe(this.swipedir);
+    this.handleSwipe(swipeDirection);
     e.preventDefault();
-  }
-
-  handleSwipe(swipe: 'up' | 'down' | 'left' | 'right') {
-    swipe === 'up'
-      ? this.move(38)
-      : swipe === 'down'
-      ? this.move(40)
-      : swipe === 'left'
-      ? this.move(37)
-      : swipe === 'right'
-      ? this.move(39)
-      : false;
   }
 
   resetGame() {
@@ -272,9 +281,9 @@ export class BoardComponent implements AfterViewInit {
   }
 
   showHighscores() {
-    if (this.highScores?.length) {
+    if (this.config?.highScores?.length) {
       this.dialog.open(HighScoresComponent, {
-        data: this.highScores,
+        data: this.config.highScores,
         maxWidth: '80vw',
         maxHeight: '80vh',
         panelClass: 'high-scores',
@@ -302,7 +311,7 @@ export class BoardComponent implements AfterViewInit {
   }
 
   drop(): boolean {
-    let p = this.moves[KEY.DOWN](this.piece);
+    let p = this.moves[Key.ArrowDown](this.piece);
     if (this.service.valid(p, this.board)) {
       this.piece.move(p);
     } else {
@@ -437,6 +446,7 @@ export class BoardComponent implements AfterViewInit {
           if (this.config.selectedMusicTheme != copy.selectedMusicTheme) {
             ['A', 'B', 'C'].forEach((k) => (this.audio[k].currentTime = 0));
           }
+          localStorage.setItem('config', JSON.stringify(this.config));
         }
       });
   }
